@@ -1,0 +1,115 @@
+
+niveau: "BTS CIEL IR — 2e année"
+cadre: "Mini-projet en binôme"
+duree: "6 heures"
+environnement: "XAMPP / Apache / MariaDB, HTML5, CSS3, JavaScript, PHP, PDO"
+tags:
+  - bts-ciel
+  - php
+  - sql
+  - web
+  - cahier-des-charges
+
+# Cahier des charges : Application Web de Gestion de Médiathèque
+
+## 1. Contexte et Objectifs du Projet
+La médiathèque dispose déjà d'une base de données relationnelle (nommée `mediatheque`) permettant de gérer les adhérents, les livres, les auteurs, les catégories et les emprunts. L'objectif de ce projet est de s'affranchir de l'utilisation directe de phpMyAdmin pour les opérations courantes en développant une application Web dédiée au personnel.
+
+L'application doit permettre de :
+* Consulter le catalogue des livres et leurs informations principales.
+* Rechercher un ouvrage par son titre (et potentiellement par auteur ou catégorie en bonus).
+* Consulter la liste des adhérents.
+* Enregistrer de nouveaux emprunts et gérer les retours de livres.
+* Suivre en temps réel les emprunts en cours et identifier visuellement les retards.
+
+
+
+## 2. Modèle de Données et Règles de Gestion
+
+### Modèle Physique de Données (MPD)
+La base de données repose sur les tables suivantes :
+* **ADHERENT** (`id_adherent`, `nom`, `prenom`, `email`, `date_inscription`)
+* **LIVRE** (`id_livre`, `titre`, `isbn`, `annee_publication`, `disponible`, `id_categorie`)
+* **AUTEUR** (`id_auteur`, `nom`, `prenom`)
+* **CATEGORIE** (`id_categorie`, `libelle`)
+* **EMPRUNT** (`id_emprunt`, `id_adherent`, `id_livre`, `date_emprunt`, `date_retour_prevue`, `date_retour`)
+* **LIVRE_AUTEUR** (Table de jointure N:N entre `LIVRE` et `AUTEUR`)
+
+### Règles de Gestion Métier
+* Un adhérent peut effectuer plusieurs emprunts, mais un emprunt n'est rattaché qu'à un seul adhérent.
+* Un livre peut être emprunté successivement à différentes dates, mais un emprunt actif ne concerne qu'un seul livre.
+* Un livre appartient à une seule catégorie, mais une catégorie peut regrouper plusieurs livres.
+* Un livre peut être écrit par un ou plusieurs auteurs (relation N:N gérée par `LIVRE_AUTEUR`)
+* **Disponibilité :** Un livre ne peut être proposé à l'emprunt que si son statut `disponible` est à vrai (TRUE)
+
+
+## 3. Spécifications Fonctionnelles
+
+| Fonction | Description détaillée |
+| :--- | :--- |
+| **F01 — Accueil** | Page d'accueil (`index.php`) présentant le nom de l'application, un menu de navigation commun et un tableau de bord statistique |
+| **F02 — Liste des livres** | Affichage tabulaire des ouvrages : titre, auteur(s), catégorie, année de publication, ISBN et statut de disponibilité. |
+| **F03 — Recherche** | Formulaire de recherche textuelle de livres par titre (possibilité d'extension par auteur/catégorie) |
+| **F04 — Liste des adhérents** | Affichage des informations des inscrits : nom, prénom, e-mail et date d'inscription. |
+| **F05 — Nouvel emprunt** | Interface de création d'emprunt associant un adhérent et un livre strictement disponible (date d'emprunt au jour J, retour prévu à J+14) |
+| **F06 — Emprunts en cours** | Suivi des emprunts non clôturés (`date_retour IS NULL`) avec l'adhérent, le livre, la date d'emprunt et la date de retour prévue |
+| **F07 — Gestion des retards** | Détection automatique : si `date_retour IS NULL` et que la date du jour dépasse `date_retour_prevue`, affichage explicite de la mention **« EN RETARD »** avec une mise en forme CSS spécifique. |
+| **F08 — Retour de livre** | Action de clôture : mise à jour de la `date_retour` à la date du jour et passage du livre concerné à l'état disponible (`disponible = TRUE`) |
+
+
+## 4. Contraintes Techniques et Sécurité
+* **Langages et Environnement :** HTML5, CSS3, JavaScript, PHP, et MySQL/MariaDB
+* **Connexion :** Utilisation obligatoire de **PDO** pour la connexion à la base de données via le fichier centralisé (`config/db.php`)
+* **Sécurité des données :**
+  * Utilisation systématique de **requêtes préparées** pour toutes les interactions de formulaires
+  * Protection contre les failles XSS à l'aide de `htmlspecialchars()` lors de l'affichage
+
+
+
+## 5. Architecture Logicielle et Organisation du Projet
+Le projet adopte une structure modulaire et rigoureuse :
+
+
+│   └── db.php
+
+│   ├── footer.php
+
+│   └── header.php
+
+├── index.php
+
+├── style.css
+
+├── adherents.php
+
+├── ajouter_adherent.php
+
+├── ajouter_livre.php
+    
+├── emprunter.php
+    
+├── emprunts.php
+    
+├── livres.php
+    
+└── retour.php
+    
+
+
+7. Difficultés Techniques Rencontrées et Résolutions
+
+chemins d'accès : des boutons qui était censé rediriger vers d'autres pages ne marchais pas
+solutions : les lignes de code pour la redirections avait des erreurs au niveau des noms de fichiers
+
+8. Planning Prévisionnel de Réalisation (6 Heures)
+- 0h00 – 1h00 : Analyse du cahier des charges, vérification de la base de données, mise en place de l'arborescence et de la connexion PHP/PDO
+
+- 1h00 – 2h15 : Développement de l'accueil (index.php), de la navigation globale et de la liste des livres
+
+- 2h15 – 3h00 : Implémentation de la liste des adhérents et du module de recherche
+
+- 3h00 – 4h30 : Développement du formulaire de création d'emprunt et mise à jour de la disponibilité
+
+- 4h30 – 5h15 : Gestion des retours, affichage des emprunts en cours et des retards
+
+- 5h15 – 6h00 : Phase de tests, corrections, captures d'écran, rédaction du README et préparation du rendu
