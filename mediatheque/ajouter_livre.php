@@ -6,27 +6,19 @@ $titre = "Ajouter un livre";
 
 $message = "";
 
-/* Récupérer les auteurs */
 $auteurs = $pdo->query("
     SELECT id_auteur, nom, prenom
     FROM auteur
     ORDER BY nom, prenom
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-
-/* Traitement du formulaire */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $titreLivre = $_POST['titre'];
     $isbn = $_POST['isbn'];
     $annee = $_POST['annee_publication'];
     $idCategorie = $_POST['id_categorie'];
-
-    // Récupération des auteurs sélectionnés
     $auteursSelectionnes = $_POST['auteurs'] ?? [];
-
-
-    /* Vérifier l'ISBN */
 
     $verification = $pdo->prepare("
         SELECT id_livre
@@ -49,11 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
 
-            // Commencer une transaction
             $pdo->beginTransaction();
 
-
-            /* Ajouter le livre */
 
             $sql = "
                 INSERT INTO livre
@@ -77,12 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
 
-            /* Récupérer l'id du livre créé */
 
             $idLivre = $pdo->lastInsertId();
 
 
-            /* Ajouter les auteurs */
 
             $sqlAuteur = "
                 INSERT INTO livre_auteur
@@ -105,18 +92,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
 
-            // Valider toutes les opérations
             $pdo->commit();
 
-
-            // Retourner vers la liste
             header("Location: livres.php");
             exit;
 
 
         } catch (Exception $e) {
 
-            // Annuler les modifications en cas d'erreur
             $pdo->rollBack();
 
             $message = "Erreur lors de l'ajout du livre : "
@@ -148,9 +131,6 @@ require "header.php";
 
 <form method="POST">
 
-
-    <!-- TITRE -->
-
     <div class="form-group">
 
         <label>Titre du livre</label>
@@ -164,8 +144,6 @@ require "header.php";
 
     </div>
 
-
-    <!-- ISBN -->
 
     <div class="form-group">
 
@@ -181,8 +159,6 @@ require "header.php";
     </div>
 
 
-    <!-- ANNÉE -->
-
     <div class="form-group">
 
         <label>Année de publication</label>
@@ -197,8 +173,6 @@ require "header.php";
     </div>
 
 
-    <!-- CATÉGORIE -->
-
     <div class="form-group">
 
         <label>ID de la catégorie</label>
@@ -212,8 +186,6 @@ require "header.php";
 
     </div>
 
-
-    <!-- AUTEURS -->
 
     <div class="form-group">
 
