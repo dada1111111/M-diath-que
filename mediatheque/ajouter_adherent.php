@@ -72,11 +72,12 @@ require "header.php";
     <div class="form-group">
         <label>Nom</label>
 
-        <input>
+        <input
             type="text"
             name="nom"
             required
             placeholder="Ex : Fervil"
+        >
         
 
     </div>
